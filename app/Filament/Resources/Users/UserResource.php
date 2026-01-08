@@ -31,6 +31,7 @@ class UserResource extends Resource
 
   // Название во множественном числе (Заголовок страницы)
   protected static ?string $pluralModelLabel = 'Сотрудники';
+  protected static string|null|\UnitEnum $navigationGroup = 'Пользователи';
 
   public static function form(Schema $schema): Schema
   {
