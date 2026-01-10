@@ -34,5 +34,9 @@ return [
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
+    'ms' => [
+        'token' => env('MS_TOKEN'),
+        'url' => env('MS_API_URL', 'https://api.moysklad.ru/api/remap/1.2'),
+    ],
 
 ];
