@@ -5,45 +5,42 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
-  /**
-   * Run the migrations.
-   */
-  public function up(): void
-  {
-    Schema::create('customers', function (Blueprint $table) {
-      $table->id();
+    public function up(): void
+    {
+        Schema::create('customers', function (Blueprint $table) {
+            $table->id();
 
-      // 1. Учетные данные
-      $table->string('phone')->unique()->comment('Логин');
-      $table->string('email')->nullable()->unique();
-      $table->string('password');
-      $table->rememberToken();
+            // --- АВТОРИЗАЦИЯ ---
+            $table->string('phone')->nullable();
+            $table->string('phone_normalized', 20)->unique()->index();
+            $table->string('email')->nullable()->unique();
+            $table->string('password')->nullable();
+            $table->rememberToken();
 
-      // 2. Контактное лицо (ФИО)
-      $table->string('first_name');
-      $table->string('last_name')->nullable();
+            // --- ЛИЧНЫЕ ДАННЫЕ ---
+            $table->string('first_name')->nullable();
+            $table->string('last_name')->nullable();
+            $table->date('birth_date')->nullable();
+            $table->string('gender', 10)->nullable();
 
-      // 3. Интеграция с МС (Физлицо)
-      $table->uuid('ms_id')->nullable()->unique()->comment('ID Контрагента-физлица в МС');
-      $table->string('ms_price_type')->nullable()->comment('Название типа цены (Розница, Опт, Дилер)');
+            // Адрес (было address_fact)
+            $table->text('actual_address')->nullable()->comment('МС: actualAddress');
 
-      // 4. Лояльность (Кэш баланса)
-      $table->decimal('loyalty_balance', 10, 2)->default(0);
+            // --- ИНТЕГРАЦИЯ С МС ---
+            $table->uuid('ms_id')->nullable()->unique();
+            $table->uuid('ms_price_type_uuid')->nullable();
+            $table->uuid('ms_bonus_program_id')->nullable();
 
-      // 5. Системные метки
-      // Помогает фронтенду понять, показывать ли B2B интерфейс по умолчанию
-      $table->enum('main_role', ['b2c', 'b2b'])->default('b2c');
+            // --- КЭШ ---
+            $table->decimal('loyalty_balance', 10, 2)->default(0);
 
-      $table->timestamps();
-      $table->softDeletes();
-    });
-  }
+            $table->timestamps();
+            $table->softDeletes();
+        });
+    }
 
-  /**
-   * Reverse the migrations.
-   */
-  public function down(): void
-  {
-    Schema::dropIfExists('customers');
-  }
+    public function down(): void
+    {
+        Schema::dropIfExists('customers');
+    }
 };

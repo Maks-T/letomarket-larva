@@ -8,20 +8,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class LoyaltyTransaction extends Model
 {
-  use HasFactory;
+    use HasFactory;
 
-  protected $fillable = [
-    'customer_id', 'amount', 'type',
-    'description', 'meta'
-  ];
+    protected $guarded = ['id', 'created_at', 'updated_at'];
 
-  protected $casts = [
-    'amount' => 'decimal:2',
-    'meta' => 'array',
-  ];
+    protected $casts = [
+        'amount' => 'decimal:2',
+        'meta' => 'array',
+    ];
 
-  public function customer(): BelongsTo
-  {
-    return $this->belongsTo(Customer::class);
-  }
+    public function customer(): BelongsTo
+    {
+        return $this->belongsTo(Customer::class);
+    }
 }

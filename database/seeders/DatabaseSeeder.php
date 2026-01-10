@@ -23,8 +23,8 @@ class DatabaseSeeder extends Seeder
     ]);*/
 
     $this->call([
-      CreateSuperAdminSeeder::class,
       RolesAndPermissionsSeeder::class,
+      CreateSuperAdminSeeder::class,
     ]);
   }
 }

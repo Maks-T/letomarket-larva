@@ -16,6 +16,8 @@ class CustomersTable
             ->columns([
                 TextColumn::make('phone')
                     ->searchable(),
+                TextColumn::make('phone_normalized')
+                    ->searchable(),
                 TextColumn::make('email')
                     ->label('Email address')
                     ->searchable(),
@@ -23,15 +25,20 @@ class CustomersTable
                     ->searchable(),
                 TextColumn::make('last_name')
                     ->searchable(),
+                TextColumn::make('birth_date')
+                    ->date()
+                    ->sortable(),
+                TextColumn::make('gender')
+                    ->searchable(),
                 TextColumn::make('ms_id')
                     ->searchable(),
-                TextColumn::make('ms_price_type')
+                TextColumn::make('ms_price_type_uuid')
+                    ->searchable(),
+                TextColumn::make('ms_bonus_program_id')
                     ->searchable(),
                 TextColumn::make('loyalty_balance')
                     ->numeric()
                     ->sortable(),
-                TextColumn::make('main_role')
-                    ->badge(),
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

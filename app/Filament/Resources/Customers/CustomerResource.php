@@ -16,46 +16,45 @@ use Filament\Tables\Table;
 
 class CustomerResource extends Resource
 {
-  protected static ?string $model = Customer::class;
+    protected static ?string $model = Customer::class;
 
-  protected static string|null|BackedEnum $navigationIcon = Heroicon::OutlinedUserGroup;
+    protected static string|null|BackedEnum $navigationIcon = Heroicon::OutlinedUserGroup;
 
-  protected static ?string $recordTitleAttribute = 'first_name';
+    protected static ?string $recordTitleAttribute = 'first_name';
+    protected static ?string $navigationLabel = 'Клиенты';
+    protected static ?string $modelLabel = 'Клиент';
+    protected static ?string $pluralModelLabel = 'Клиенты';
+    protected static string|null|\UnitEnum $navigationGroup = 'Пользователи';
 
-  protected static ?string $navigationLabel = 'Клиенты';
-  protected static ?string $modelLabel = 'Клиент';
-  protected static ?string $pluralModelLabel = 'Клиенты';
-  protected static string|null|\UnitEnum $navigationGroup = 'Пользователи';
+    // Настройка глобального поиска (строка сверху)
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['phone', 'first_name', 'last_name', 'email'];
+    }
 
-  // Настройка глобального поиска (строка сверху)
-  public static function getGloballySearchableAttributes(): array
-  {
-    return ['phone', 'first_name', 'last_name', 'email'];
-  }
+    public static function form(Schema $schema): Schema
+    {
+        return CustomerForm::configure($schema);
+    }
 
-  public static function form(Schema $schema): Schema
-  {
-    return CustomerForm::configure($schema);
-  }
+    public static function table(Table $table): Table
+    {
+        return CustomersTable::configure($table);
+    }
 
-  public static function table(Table $table): Table
-  {
-    return CustomersTable::configure($table);
-  }
+    public static function getRelations(): array
+    {
+        return [
+            //
+        ];
+    }
 
-  public static function getRelations(): array
-  {
-    return [
-      //
-    ];
-  }
-
-  public static function getPages(): array
-  {
-    return [
-      'index' => ListCustomers::route('/'),
-      'create' => CreateCustomer::route('/create'),
-      'edit' => EditCustomer::route('/{record}/edit'),
-    ];
-  }
+    public static function getPages(): array
+    {
+        return [
+            'index' => ListCustomers::route('/'),
+            'create' => CreateCustomer::route('/create'),
+            'edit' => EditCustomer::route('/{record}/edit'),
+        ];
+    }
 }

@@ -5,38 +5,35 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
-  /**
-   * Run the migrations.
-   */
-  public function up(): void
-  {
-    Schema::create('loyalty_transactions', function (Blueprint $table) {
-      $table->id();
-      $table->foreignId('customer_id')->constrained()->cascadeOnDelete();
+    public function up(): void
+    {
+        Schema::create('loyalty_transactions', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('customer_id')->constrained()->cascadeOnDelete();
 
-      // Сумма операции (+100.00 или -50.00)
-      $table->decimal('amount', 10, 2);
+            // UUID транзакции в МоемСкладе (чтобы избегать дублей)
+            $table->uuid('ms_id')->nullable()->unique();
 
-      // Тип операции
-      // 'earn' (начисление), 'spend' (списание), 'adjustment' (корректировка), 'sync' (синхронизация)
-      $table->string('type')->index();
+            // Ссылка на документ-основание (Заказ или Продажа)
+            $table->uuid('ms_document_id')->nullable();
 
-      // Описание для клиента
-      $table->string('description')->nullable();
+            // Сумма (+ или -)
+            $table->decimal('amount', 10, 2);
 
-      // Мета-данные (JSON) для связи с внешними системами
-      // Пример: {"order_id": 123, "ms_bonus_transaction_id": "uuid..."}
-      $table->json('meta')->nullable();
+            // Тип: EARN (начисление), SPEND (списание)
+            $table->string('type')->index()->nullable();
 
-      $table->timestamps();
-    });
-  }
+            $table->string('description')->nullable();
 
-  /**
-   * Reverse the migrations.
-   */
-  public function down(): void
-  {
-    Schema::dropIfExists('loyalty_transactions');
-  }
+            // Храним весь JSON от МС
+            $table->json('meta')->nullable();
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('loyalty_transactions');
+    }
 };

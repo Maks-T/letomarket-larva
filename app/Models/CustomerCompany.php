@@ -2,22 +2,30 @@
 
 namespace App\Models;
 
+use App\Enums\CompanyType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class CustomerCompany extends Model
 {
-  use HasFactory;
+    use HasFactory;
 
-  protected $fillable = [
-    'customer_id', 'ms_id', 'title', 'name',
-    'inn', 'kpp', 'address_legal', 'address_fact',
-    'bank_name', 'bik', 'account_number', 'corr_account'
-  ];
+    protected $guarded = ['id', 'created_at', 'updated_at'];
 
-  public function customer(): BelongsTo
-  {
-    return $this->belongsTo(Customer::class);
-  }
+    // Автоматическое преобразование строки из БД в Enum
+    protected $casts = [
+        'type' => CompanyType::class,
+    ];
+
+    public function customer(): BelongsTo
+    {
+        return $this->belongsTo(Customer::class);
+    }
+
+    // Хелпер: Это ИП?
+    public function isEntrepreneur(): bool
+    {
+        return $this->type === CompanyType::ENTREPRENEUR;
+    }
 }
