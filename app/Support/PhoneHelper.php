@@ -33,4 +33,16 @@ class PhoneHelper
         $normalized = self::normalize($phone);
         return substr($normalized, -10);
     }
+
+    /**
+     * Определяет тип контакта: 'email' или 'phone'
+     */
+    public static function detectType(string $input): string
+    {
+        if (str_contains($input, '@')) {
+            return 'email';
+        }
+
+        return 'phone';
+    }
 }
