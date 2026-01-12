@@ -1,25 +1,46 @@
-# 1. Имя группы контейнеров (чтобы не было "docker")
 name: letomarket
 
 services:
+  # Сервис Web-сервера (Nginx)
+  nginx:
+    image: nginx:alpine
+    container_name: '${APP_NAME:-letomarket}-nginx'
+    ports:
+      - "${APP_PORT:-80}:80"
+    volumes:
+      - ../:/var/www/html
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+    networks:
+      - default
+
+  # Сервис приложения (PHP 8.4 + Node + Composer)
   app:
     build:
       context: ../
       dockerfile: docker/php/Dockerfile
+      args:
+        user: laravel
+        uid: 1000
     container_name: '${APP_NAME:-letomarket}-app'
+    restart: unless-stopped
     ports:
-      - "${APP_PORT:-80}:8080"
       - "${VITE_PORT:-5173}:5173"
     volumes:
       - ../:/var/www/html
+    environment:
+      VITE_HMR_HOST: localhost
+    # Пробрасываем env файл внутрь
+    env_file:
+      - ../.env
     depends_on:
       - db
       - redis
-    env_file:
-      - ../.env
-    environment:
-      VITE_HMR_HOST: localhost
+    networks:
+      - default
 
+  # База данных
   db:
     image: mysql:8.0
     container_name: '${APP_NAME:-letomarket}-db'
@@ -39,6 +60,7 @@ services:
     networks:
       - default
 
+  # Кэш
   redis:
     image: redis:7-alpine
     container_name: '${APP_NAME:-letomarket}-redis'
@@ -54,6 +76,7 @@ services:
     networks:
       - default
 
+  # Админка БД (Adminer или PMA)
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     container_name: '${APP_NAME:-letomarket}-pma'

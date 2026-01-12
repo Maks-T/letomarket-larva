@@ -1,59 +1,147 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🚀 Letomarket: Development Guide
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Инструкция по локальному развертыванию проекта (Docker + Laravel 12 + React/Inertia).
 
-## About Laravel
+## 📋 Предварительные требования
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **WSL2** (Ubuntu 24.04)  
+- **Docker Desktop** (интегрированный с WSL2)  
+- **Node.js 22+** (устанавливается внутри контейнера, локально не обязателен)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 1. Настройка Git и SSH
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+Настройка доступа к репозиторию GitHub (если ключи еще не добавлены в агент):
 
-## Learning Laravel
+```bash
+# 1. Генерация ключа (если его нет)
+ssh-keygen -t ed25519 -C "maxim.tsatsura@gmail.com" -f ~/.ssh/id_ed25519_work_github
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+# 2. Запуск агента и добавление ключа
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_ed25519_work_github
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+# 3. Проверка соединения
+ssh -Tv git@github.com
+```
 
-## Laravel Sponsors
+## 2. Подготовка окружения (.env)
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Создайте файл `.env` в корне проекта:
 
-### Premium Partners
+```bash
+cp .env.example .env
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+Убедитесь, что в `.env` прописаны настройки для Docker:
 
-## Contributing
+```ini
+APP_NAME=letomarket
+APP_URL=http://localhost
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+# Порты Docker
+APP_PORT=80
+VITE_PORT=5173
+PMA_PORT=8081
 
-## Code of Conduct
+# База данных и кэш
+DB_CONNECTION=mysql
+DB_HOST=db
+DB_PORT=3306
+DB_DATABASE=letomarket
+DB_USERNAME=laravel
+DB_PASSWORD=root
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+REDIS_HOST=redis
+```
 
-## Security Vulnerabilities
+## 3. Запуск Docker
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+Для корректной работы переменных окружения создается символическая ссылка:
 
-## License
+```bash
+# 1. Переходим в папку конфигурации Docker
+cd docker
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+# 2. Создаем симлинк на .env (чтобы Docker видел переменные из корня)
+# Важно: выполнять внутри WSL/Linux терминала
+ln -s ../.env .env
+
+# 3. Собираем и запускаем контейнеры
+docker compose up -d --build
+```
+
+## 4. Установка приложения (Backend)
+
+Все команды выполняются **внутри контейнера**.
+
+Вход в контейнер:
+
+```bash
+# Если настроен Makefile (из корня)
+make bash
+
+# Или стандартный способ (из папки docker/)
+docker compose exec app bash
+```
+
+Инициализация проекта (внутри контейнера):
+
+```bash
+# Установка зависимостей
+composer install
+
+# Генерация ключа приложения
+php artisan key:generate
+
+# Создание ссылки на storage
+php artisan storage:link
+
+# Миграции БД
+php artisan migrate --force
+
+# Генерация ролей и прав (Filament Shield)
+php artisan shield:generate --all --ignore-existing-policies
+
+# Обновление ассетов админки
+php artisan filament:upgrade
+
+# Наполнение тестовыми данными (Super Admin, роли)
+php artisan db:seed
+```
+
+## 5. Запуск фронтенда (Frontend)
+
+Для работы сайта (Vite + React) нужно запустить сервер разработки (в отдельном терминале):
+
+```bash
+# Вход в контейнер (если еще не там)
+make bash
+
+# Установка JS пакетов
+npm install
+
+# Запуск dev-сервера (HMR)
+npm run dev
+```
+
+## 🔗 Доступы и полезные ссылки
+
+| Сервис          | Адрес | Логин | Пароль |
+|-----------------|--------|--------|--------|
+| Сайт            | http://localhost | – | – |
+| Админка         | http://localhost/admin | admin@letomarket.ru | leto111222 |
+| phpMyAdmin (БД) | http://localhost:8081 | laravel | root |
+
+**Параметры подключения к БД (для Adminer/IDE):**
+- Server: `db` (внутри Docker) или `localhost` (если проброшен порт 3306)  
+- Database: `letomarket`
+
+## 🛠 Устранение проблем
+
+**Ошибка прав доступа (Permission denied)** при создании файлов:  
+Если файлы, созданные через artisan, заблокированы для редактирования в Windows:
+
+```bash
+# Выполнить в корне проекта (в WSL)
+sudo chown -R $USER:$USER .
+```
