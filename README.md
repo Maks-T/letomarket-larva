@@ -100,7 +100,7 @@ php artisan storage:link
 php artisan migrate --force
 
 # Генерация ролей и прав (Filament Shield)
-php artisan shield:generate --all --ignore-existing-policies
+php artisan shield:generate --all
 
 # Обновление ассетов админки
 php artisan filament:upgrade
