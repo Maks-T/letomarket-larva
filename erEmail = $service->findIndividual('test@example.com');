@@ -1,0 +1,80 @@
+[90m= [39m[
+    "[34mmeta[39m" => [
+      "[34mhref[39m" => "[32mhttps://api.moysklad.ru/api/remap/1.2/entity/counterparty/0003169a-a343-11f0-0a80-018700105486[39m",
+      "[34mmetadataHref[39m" => "[32mhttps://api.moysklad.ru/api/remap/1.2/entity/counterparty/metadata[39m",
+      "[34mtype[39m" => "[32mcounterparty[39m",
+      "[34mmediaType[39m" => "[32mapplication/json[39m",
+      "[34muuidHref[39m" => "[32mhttps://online.moysklad.ru/app/#company/edit?id=0003169a-a343-11f0-0a80-018700105486[39m",
+    ],
+    "[34mid[39m" => "[32m0003169a-a343-11f0-0a80-018700105486[39m",
+    "[34maccountId[39m" => "[32m27508565-815b-11f0-0a80-10590001678f[39m",
+    "[34mshared[39m" => [36mfalse[39m,
+    "[34mgroup[39m" => [
+      "[34mmeta[39m" => [
+        "[34mhref[39m" => "[32mhttps://api.moysklad.ru/api/remap/1.2/entity/group/2750bb90-815b-11f0-0a80-105900016790[39m",
+        "[34mmetadataHref[39m" => "[32mhttps://api.moysklad.ru/api/remap/1.2/entity/group/metadata[39m",
+        "[34mtype[39m" => "[32mgroup[39m",
+        "[34mmediaType[39m" => "[32mapplication/json[39m",
+      ],
+    ],
+    "[34mupdated[39m" => "[32m2025-10-07 09:01:00.663[39m",
+    "[34mname[39m" => "[32mВячеслав[39m",
+    "[34mexternalCode[39m" => "[32mkxnqm5nsgmwf9UM6F7PyX3[39m",
+    "[34marchived[39m" => [36mfalse[39m,
+    "[34mcreated[39m" => "[32m2025-10-07 09:01:00.663[39m",
+    "[34mcompanyType[39m" => "[32mindividual[39m",
+    "[34mlegalTitle[39m" => "[32mВячеслав[39m",
+    "[34mlegalFirstName[39m" => "[32mВячеслав[39m",
+    "[34mphone[39m" => "[32m79080102571[39m",
+    "[34maccounts[39m" => [
+      "[34mmeta[39m" => [
+        "[34mhref[39m" => "[32mhttps://api.moysklad.ru/api/remap/1.2/entity/counterparty/0003169a-a343-11f0-0a80-018700105486/accounts[39m",
+        "[34mtype[39m" => "[32maccount[39m",
+        "[34mmediaType[39m" => "[32mapplication/json[39m",
+        "[34msize[39m" => [35m0[39m,
+        "[34mlimit[39m" => [35m1000[39m,
+        "[34moffset[39m" => [35m0[39m,
+      ],
+    ],
+    "[34mtags[39m" => [],
+    "[34mcontactpersons[39m" => [
+      "[34mmeta[39m" => [
+        "[34mhref[39m" => "[32mhttps://api.moysklad.ru/api/remap/1.2/entity/counterparty/0003169a-a343-11f0-0a80-018700105486/contactpersons[39m",
+        "[34mtype[39m" => "[32mcontactperson[39m",
+        "[34mmediaType[39m" => "[32mapplication/json[39m",
+        "[34msize[39m" => [35m0[39m,
+        "[34mlimit[39m" => [35m1000[39m,
+        "[34moffset[39m" => [35m0[39m,
+      ],
+    ],
+    "[34mnotes[39m" => [
+      "[34mmeta[39m" => [
+        "[34mhref[39m" => "[32mhttps://api.moysklad.ru/api/remap/1.2/entity/counterparty/0003169a-a343-11f0-0a80-018700105486/notes[39m",
+        "[34mtype[39m" => "[32mnote[39m",
+        "[34mmediaType[39m" => "[32mapplication/json[39m",
+        "[34msize[39m" => [35m0[39m,
+        "[34mlimit[39m" => [35m1000[39m,
+        "[34moffset[39m" => [35m0[39m,
+      ],
+    ],
+    "[34mstate[39m" => [
+      "[34mmeta[39m" => [
+        "[34mhref[39m" => "[32mhttps://api.moysklad.ru/api/remap/1.2/entity/counterparty/metadata/states/27cf1ba3-815b-11f0-0a80-144200245e5a[39m",
+        "[34mmetadataHref[39m" => "[32mhttps://api.moysklad.ru/api/remap/1.2/entity/counterparty/metadata[39m",
+        "[34mtype[39m" => "[32mstate[39m",
+        "[34mmediaType[39m" => "[32mapplication/json[39m",
+      ],
+    ],
+    "[34msalesAmount[39m" => [33m0.0[39m,
+    "[34mfiles[39m" => [
+      "[34mmeta[39m" => [
+        "[34mhref[39m" => "[32mhttps://api.moysklad.ru/api/remap/1.2/entity/counterparty/0003169a-a343-11f0-0a80-018700105486/files[39m",
+        "[34mtype[39m" => "[32mfiles[39m",
+        "[34mmediaType[39m" => "[32mapplication/json[39m",
+        "[34msize[39m" => [35m0[39m,
+        "[34mlimit[39m" => [35m1000[39m,
+        "[34moffset[39m" => [35m0[39m,
+      ],
+    ],
+  ]
+
