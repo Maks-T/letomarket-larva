@@ -5,6 +5,7 @@ import { createRoot } from 'react-dom/client';
 import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { AuthProvider } from '@/Contexts/AuthContext';
+import { Toaster } from '@/components/ui/sonner';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Letomarket';
 
@@ -16,10 +17,11 @@ createInertiaApp({
         root.render(
             <AuthProvider>
                 <App {...props} />
+                <Toaster position="top-right" richColors closeButton />
             </AuthProvider>
         );
     },
     progress: {
-        color: '#4B5563',
+        color: '#F15921',
     },
 });

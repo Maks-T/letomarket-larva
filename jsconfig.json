@@ -12,7 +12,7 @@
         "resources/js/Pages/*"
       ],
       "@components/*": [
-        "resources/js/Components/*"
+        "resources/js/components/*"
       ]
     }
   },

@@ -1,4 +1,4 @@
-import { useAuth } from "@/Contexts/AuthContext";
+import { useAuth } from "@/Contexts/AuthContext.jsx";
 import { Link, usePage } from "@inertiajs/react";
 
 export default function Header() {
@@ -8,7 +8,7 @@ export default function Header() {
     return (
         <header className="h-20 bg-blue-200 flex items-center justify-between px-8 border-b-2 border-blue-400">
             <div className="font-bold text-blue-800 text-xl">
-                <Link href="/">Letomarket</Link>
+                <Link href="/public">Letomarket</Link>
             </div>
 
             <a href="/admin" className="text-blue-800 hover:text-blue-600 font-medium">

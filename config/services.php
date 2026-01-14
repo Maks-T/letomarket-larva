@@ -38,5 +38,10 @@ return [
         'token' => env('MS_TOKEN'),
         'url' => env('MS_API_URL', 'https://api.moysklad.ru/api/remap/1.2'),
     ],
+    'notisend' => [
+        'key' => env('NOTISEND_API_KEY'),
+        'project' => env('NOTISEND_SENDER', 'Letomarket'),
+        'test_mode' => env('NOTISEND_TEST_MODE', false),
+    ],
 
 ];

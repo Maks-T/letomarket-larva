@@ -17,24 +17,18 @@ class MsClient
         $this->token = config('services.ms.token');
     }
 
-    /**
-     * Настройка HTTP клиента с Bearer Token
-     */
     protected function makeRequest(): PendingRequest
     {
         return Http::withToken($this->token)
             ->baseUrl($this->baseUrl)
             ->withHeaders([
-                'Accept-Encoding' => 'gzip', // Сжатие для скорости
+                'Accept-Encoding' => 'gzip',
                 'Content-Type' => 'application/json',
             ])
-            ->timeout(30)
+            ->timeout(60) // Увеличим таймаут
             ->retry(3, 100);
     }
 
-    /**
-     * Универсальный GET с пагинацией (Генератор)
-     */
     public function getAll(string $endpoint, array $params = []): \Generator
     {
         $limit = 100;
@@ -62,5 +56,25 @@ class MsClient
             $offset += $limit;
 
         } while ($offset < $total && count($rows) > 0);
+    }
+
+    /**
+     * Скачивание файла (картинки) по ссылке из мета-данных МС
+     */
+    public function download(string $url): ?string
+    {
+        try {
+            $response = Http::withToken($this->token)
+                ->timeout(30)
+                ->get($url);
+
+            if ($response->successful()) {
+                return $response->body();
+            }
+        } catch (\Exception $e) {
+            Log::error("Failed to download image: $url. Error: " . $e->getMessage());
+        }
+
+        return null;
     }
 }

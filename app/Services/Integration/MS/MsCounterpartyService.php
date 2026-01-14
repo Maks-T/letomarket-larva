@@ -3,36 +3,22 @@
 namespace App\Services\Integration\MS;
 
 use App\Support\PhoneHelper;
-use Illuminate\Http\Client\ConnectionException;
-use Illuminate\Http\Client\RequestException;
 
 class MsCounterpartyService extends MsClient
 {
     /**
-     * Универсальный поиск Физлица (по телефону ИЛИ email)
-     * @param string $login Введенный пользователем логин (email или телефон)
+     * Продвинутый поиск физлица.
+     * Ищем по точному совпадению email или по вхождению последних 10 цифр телефона.
      */
     public function findIndividual(string $login): ?array
     {
-        // Простая проверка: если есть @ - это email
-        if (str_contains($login, '@')) {
-            return $this->findIndividualByEmail($login);
-        }
+        $type = PhoneHelper::detectType($login);
+        $filter = $type === 'email'
+            ? "email=" . strtolower(trim($login))
+            : "phone~" . PhoneHelper::forSearch($login);
 
-        return $this->findIndividualByPhone($login);
-    }
-
-    /**
-     * Поиск Физлица по телефону
-     */
-    public function findIndividualByPhone(string $phone): ?array
-    {
-        // Используем PhoneHelper только здесь, так как мы уверены, что это телефон
-        $searchPhone = PhoneHelper::forSearch($phone);
-
-        // Фильтр: телефон содержит цифры И тип = физлицо
         $response = $this->makeRequest()->get('entity/counterparty', [
-            'filter' => "phone~{$searchPhone};companyType=individual",
+            'filter' => "{$filter};companyType=individual",
             'limit' => 1
         ]);
 
@@ -40,13 +26,12 @@ class MsCounterpartyService extends MsClient
     }
 
     /**
-     * Поиск Физлица по Email
+     * Поиск Юрлица или ИП по ИНН (самый надежный способ для бизнеса)
      */
-    public function findIndividualByEmail(string $email): ?array
+    public function findCompanyByInn(string $inn): ?array
     {
-        // Для email используем строгое соответствие (=), чтобы не найти похожие
         $response = $this->makeRequest()->get('entity/counterparty', [
-            'filter' => "email={$email};companyType=individual",
+            'filter' => "inn={$inn}",
             'limit' => 1
         ]);
 
@@ -54,103 +39,27 @@ class MsCounterpartyService extends MsClient
     }
 
     /**
-     * Поиск Компаний (Юрлиц) через Контактные лица по телефону
-     * (Работает только с телефоном, так как связь через контакты обычно идет по мобильному)
+     * Метод создания/обновления контрагента
      */
-    public function findCompaniesByContact(string $phone): array
+    public function createOrUpdate(array $data, ?string $msId = null): array
     {
-        // Если передали email, поиск компаний через контактное лицо не сработает корректно в 99% случаев
-        if (str_contains($phone, '@')) {
-            return [];
-        }
+        $endpoint = 'entity/counterparty';
+        if ($msId) $endpoint .= '/' . $msId;
 
-        $searchPhone = PhoneHelper::forSearch($phone);
-        $foundCompanies = [];
-
-        // 1. Ищем в контактных лицах
-        $contacts = $this->makeRequest()->get('entity/contactperson', [
-            'filter' => "phone~{$searchPhone}",
-            'expand' => 'agent', // Подгружаем родительскую компанию
-        ])->json('rows', []);
-
-        foreach ($contacts as $contact) {
-            $agent = $contact['agent'] ?? null;
-
-            // Проверяем, что агент загрузился и это Юрлицо (legal) или ИП (entrepreneur)
-            if ($agent && in_array($agent['companyType'] ?? '', ['legal', 'entrepreneur'])) {
-                $foundCompanies[$agent['id']] = $this->mapCompanyData($agent);
-            }
-        }
-
-        // 2. Ищем в самих компаниях (прямой телефон в карточке)
-        $companies = $this->makeRequest()->get('entity/counterparty', [
-            // Ищем и ООО и ИП
-            'filter' => "phone~{$searchPhone};companyType=legal", // Можно добавить OR companyType=entrepreneur через API фильтры сложнее, проще сделать 2 запроса если критично
-        ])->json('rows', []);
-
-        foreach ($companies as $company) {
-            $foundCompanies[$company['id']] = $this->mapCompanyData($company);
-        }
-
-        return array_values($foundCompanies);
-    }
-
-    /**
-     * Создание контрагента (Физлицо или Юрлицо)
-     * @throws RequestException
-     * @throws ConnectionException
-     */
-    public function create(array $data): array
-    {
-        // Добавляем тег, чтобы знать, что создан через сайт
-        $data['tags'] = array_merge($data['tags'] ?? [], ['site_registered']);
-
-        // Формируем тело запроса
-        $body = [
-            'name' => $data['name'],
+        // Формируем тело по стандартам МС
+        $body = array_filter([
+            'name' => $data['name'] ?? 'Новый клиент (сайт)',
             'companyType' => $data['companyType'] ?? 'individual',
-            'tags' => $data['tags'],
-        ];
+            'email' => isset($data['email']) ? strtolower($data['email']) : null,
+            'phone' => isset($data['phone']) ? PhoneHelper::normalize($data['data']) : null,
+            'inn' => $data['inn'] ?? null,
+            'kpp' => $data['kpp'] ?? null,
+            'actualAddress' => $data['actual_address'] ?? null,
+            'legalAddress' => $data['legal_address'] ?? null,
+        ]);
 
-        // Заполняем контакты (телефон или email)
-        if (!empty($data['phone'])) {
-            $body['phone'] = PhoneHelper::normalize($data['phone']);
-        }
-        if (!empty($data['email'])) {
-            $body['email'] = $data['email'];
-        }
+        $request = $msId ? $this->makeRequest()->put($endpoint, $body) : $this->makeRequest()->post($endpoint, $body);
 
-        // Адрес
-        if (!empty($data['actual_address'])) {
-            $body['actualAddress'] = $data['actual_address'];
-        }
-
-        // Реквизиты для Юрлиц
-        if (($data['companyType'] ?? '') !== 'individual') {
-            if (!empty($data['inn'])) $body['inn'] = $data['inn'];
-            if (!empty($data['kpp'])) $body['kpp'] = $data['kpp'];
-            if (!empty($data['address_legal'])) $body['legalAddress'] = $data['address_legal'];
-        }
-
-        return $this->makeRequest()
-            ->post('entity/counterparty', $body)
-            ->throw()
-            ->json();
-    }
-
-    /**
-     * Форматирование данных компании для сохранения в БД
-     */
-    private function mapCompanyData(array $raw): array
-    {
-        return [
-            'ms_id' => $raw['id'],
-            'title' => $raw['name'],
-            'inn' => $raw['inn'] ?? null,
-            'kpp' => $raw['kpp'] ?? null,
-            'type' => $raw['companyType'] ?? 'legal',
-            'address_legal' => $raw['legalAddress'] ?? null,
-            'address_fact' => $raw['actualAddress'] ?? null,
-        ];
+        return $request->throw()->json();
     }
 }

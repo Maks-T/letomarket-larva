@@ -1,6 +1,6 @@
-import Header from "@/Components/Header";
-import Footer from "@/Components/Footer";
-import AuthModal from "@/Components/Auth/UI/AuthModal";
+import Header from "@/components/Header.jsx";
+import Footer from "@/components/Footer.jsx";
+import AuthModal from "@/components/Auth/AuthModal.jsx";
 import { useAuth } from "@/Contexts/AuthContext";
 
 export default function MainLayout({ children }) {

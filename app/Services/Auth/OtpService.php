@@ -35,6 +35,9 @@ class OtpService
         // Сохраняем в кэш
         Cache::put($cacheKey, $code, self::TTL);
 
+        //Временно логируем отправленные коды для тестов
+        \Illuminate\Support\Facades\Log::channel('single')->info("OTP generated for {$identifier}: {$code}");
+
         return $code;
     }
 
