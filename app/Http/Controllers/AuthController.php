@@ -9,17 +9,25 @@ use App\Http\Requests\Auth\SendCodeRequest;
 use App\Http\Requests\Auth\VerifyCodeRequest;
 use App\Models\Customer;
 use App\Services\Auth\OtpService;
+use App\Support\ContactHelper;
 use App\Support\PhoneHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
+use Illuminate\Http\JsonResponse;
+use Random\RandomException;
+use Illuminate\Routing\Redirector;
+use Illuminate\Http\RedirectResponse;
 
 class AuthController extends Controller
 {
-    // ОТПРАВКА КОДА (AJAX)
-    public function sendCode(SendCodeRequest $request, OtpService $otpService)
+    /**
+     * Отправка кода
+     * @throws ValidationException|RandomException
+     */
+    public function sendCode(SendCodeRequest $request, OtpService $otpService): JsonResponse
     {
         $login = $request->validated('login');
 
@@ -35,12 +43,17 @@ class AuthController extends Controller
         return response()->json(['status' => 'ok', 'message' => 'Код отправлен']);
     }
 
-    // ВХОД ПО КОДУ (INERTIA/AJAX)
+
+    /**
+     * Проверка кода
+     * @throws ValidationException
+     */
     public function verifyCode(
-        VerifyCodeRequest $request,
-        OtpService $otpService,
+        VerifyCodeRequest     $request,
+        OtpService            $otpService,
         LoginOrRegisterAction $action
-    ) {
+    ): JsonResponse
+    {
         $login = $request->validated('login');
         $code = $request->validated('code');
 
@@ -59,24 +72,30 @@ class AuthController extends Controller
         $request->session()->regenerate();
 
         // Возвращаем редирект для Inertia
-        return response()->json(['status' => 'ok', 'redirect' => route('cabinet.profile')]);
+        return response()->json(['status' => 'ok', 'redirect' => route('cabinet.profile')]); //ToDo добавить обработать редирект
     }
 
-    // ВХОД ПО ПАРОЛЮ
-    public function loginPassword(LoginPasswordRequest $request)
+
+    /**
+     * Вход по паролю
+     * @throws ValidationException
+     */
+    public function loginPassword(LoginPasswordRequest $request): JsonResponse
     {
         $data = $request->validated();
+        $login = $data['login'];
 
-        $type = PhoneHelper::detectType($data['login']);
-        $column = $type === 'phone' ? 'phone_normalized' : 'email';
+        // Определяем, по какой колонке искать пользователя
+        $type = ContactHelper::detectType($login);
+        $column = $type === ContactHelper::TYPE_PHONE ? 'phone_normalized' : 'email';
 
         // Попытка входа
         if (Auth::guard('web')->attempt([
-            $column => $data['login'], // Здесь уже нормализованное значение из Request
+            $column => $login,
             'password' => $data['password']
         ], true)) {
             $request->session()->regenerate();
-            return response()->json(['status' => 'ok', 'redirect' => route('cabinet.profile')]);
+            return response()->json(['status' => 'ok', 'redirect' => route('cabinet.profile')]);  //ToDo добавить обработать редирект
         }
 
         throw ValidationException::withMessages([
@@ -84,8 +103,11 @@ class AuthController extends Controller
         ]);
     }
 
-    // СБРОС ПАРОЛЯ
-    public function resetPassword(ResetPasswordRequest $request, OtpService $otpService)
+    /**
+     * Сброс и установка нового пароля
+     * @throws ValidationException
+     */
+    public function resetPassword(ResetPasswordRequest $request, OtpService $otpService): JsonResponse
     {
         $login = $request->validated('login');
         $code = $request->validated('code');
@@ -98,9 +120,9 @@ class AuthController extends Controller
             ]);
         }
 
-        // Ищем пользователя (сбрасывать пароль можно только существующему)
-        $type = PhoneHelper::detectType($login);
-        $column = $type === 'phone' ? 'phone_normalized' : 'email';
+        // 2. Ищем пользователя
+        $type = ContactHelper::detectType($login);
+        $column = $type === ContactHelper::TYPE_PHONE ? 'phone_normalized' : 'email';
 
         $customer = Customer::where($column, $login)->first();
 
@@ -110,19 +132,25 @@ class AuthController extends Controller
             ]);
         }
 
-        // Меняем пароль и входим
+        // 3. Меняем пароль
         $customer->update([
             'password' => Hash::make($password)
         ]);
 
+        // 4. Авторизуем
         Auth::guard('web')->login($customer, true);
         $request->session()->regenerate();
 
         return response()->json(['status' => 'ok', 'redirect' => route('cabinet.profile')]);
     }
 
-    // ВЫХОД
-    public function logout(Request $request)
+
+    /**
+     * Выход из аккаунта
+     * @param Request $request
+     * @return Redirector|RedirectResponse
+     */
+    public function logout(Request $request): Redirector|RedirectResponse
     {
         Auth::guard('web')->logout();
         $request->session()->invalidate();

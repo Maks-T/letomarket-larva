@@ -21,7 +21,9 @@ RUN apt-get update && apt-get install -y \
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip intl
 
 # 3. Установка Redis
-RUN pecl install redis && docker-php-ext-enable redis
+RUN pecl install redis xdebug \
+    && docker-php-ext-enable redis xdebug
+
 
 # 4. Установка Node.js 22 (LTS)
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
@@ -32,6 +34,8 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # 6. Копирование настроек PHP
 COPY docker/php/local.ini /usr/local/etc/php/conf.d/local.ini
+# Копируем настройки Xdebug
+COPY docker/php/xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini
 
 # 7. Создание системного пользователя (чтобы не работать от root)
 # Мы создаем пользователя с ID 1000, который совпадает с вашим пользователем в Ubuntu/WSL

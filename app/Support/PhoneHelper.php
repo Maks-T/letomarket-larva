@@ -25,24 +25,16 @@ class PhoneHelper
     }
 
     /**
-     * Возвращает последние 10 цифр для "мягкого" поиска в МоемСкладе
-     * Пример: из 79001234567 вернет 9001234567
+     * Возвращает последние 10 цифр для поиска
      */
     public static function forSearch(string $phone): string
     {
         $normalized = self::normalize($phone);
-        return substr($normalized, -10);
-    }
-
-    /**
-     * Определяет тип контакта: 'email' или 'phone'
-     */
-    public static function detectType(string $input): string
-    {
-        if (str_contains($input, '@')) {
-            return 'email';
+        // Если номер короче 10 цифр, возвращаем как есть, чтобы не упало
+        if (strlen($normalized) < 10) {
+            return $normalized;
         }
 
-        return 'phone';
+        return substr($normalized, -10);
     }
 }

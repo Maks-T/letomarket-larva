@@ -2,26 +2,42 @@
 
 namespace App\Http\Requests\Auth;
 
-use App\Support\PhoneHelper;
+use App\Support\ContactHelper;
 use Illuminate\Foundation\Http\FormRequest;
 
 class SendCodeRequest extends FormRequest
 {
-    public function authorize(): bool { return true; }
+    public function authorize(): bool
+    {
+        return true;
+    }
 
     protected function prepareForValidation(): void
     {
-        // Если это телефон, нормализуем его перед проверкой
-        if ($this->login && !str_contains($this->login, '@')) {
-            $this->merge(['login' => PhoneHelper::normalize($this->login)]);
+
+        if ($this->has('login')) {
+            $this->merge([
+                'login' => ContactHelper::normalize($this->input('login'))
+            ]);
         }
     }
 
     public function rules(): array
     {
         return [
-            // Login может быть email или телефоном
             'login' => ['required', 'string', 'max:255'],
+        ];
+    }
+
+    /**
+     * Кастомные сообщения для вывода на фронтенде
+     */
+    public function messages(): array
+    {
+        return [
+            'login.required' => 'Пожалуйста, введите номер телефона или Email.',
+            'login.string' => 'Неверный формат данных.',
+            'login.max' => 'Значение слишком длинное (максимум 255 символов).',
         ];
     }
 }

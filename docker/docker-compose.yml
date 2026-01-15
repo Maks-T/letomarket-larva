@@ -31,6 +31,7 @@ services:
       - ../:/var/www/html
     environment:
       VITE_HMR_HOST: localhost
+      XDEBUG_MODE: debug,develop
     # Пробрасываем env файл внутрь
     env_file:
       - ../.env
@@ -39,6 +40,8 @@ services:
       - redis
     networks:
       - default
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   # База данных
   db:

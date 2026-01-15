@@ -1,4 +1,4 @@
-import Header from "@/components/Header.jsx";
+import Header from "@/components/Header/index.jsx";
 import Footer from "@/components/Footer.jsx";
 import AuthModal from "@/components/Auth/AuthModal.jsx";
 import { useAuth } from "@/Contexts/AuthContext";
