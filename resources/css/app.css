@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap');
+
 @import 'tailwindcss';
 @import "tw-animate-css";
 
@@ -7,10 +9,10 @@
 @source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';
 @source '../**/*.js';
-@source '../**/*.jsx'; /* Добавил jsx на всякий случай */
+@source '../**/*.jsx';
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+    --font-sans: 'Rubik', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
     'Segoe UI Symbol', 'Noto Color Emoji';
 }
 
@@ -56,7 +58,6 @@
 }
 
 :root {
-    /* Скругление (чуть больше стандарта, как на макетах) */
     --radius: 0.75rem;
 
     --background: oklch(1 0 0);
@@ -70,7 +71,7 @@
 
     /* ГЛАВНЫЙ ЦВЕТ (Оранжевый #F15921) */
     --primary: oklch(0.68 0.22 39);
-    --primary-foreground: oklch(1 0 0); /* Белый текст на кнопках */
+    --primary-foreground: oklch(1 0 0);
 
     --secondary: oklch(0.967 0.001 286.375);
     --secondary-foreground: oklch(0.21 0.006 285.885);
@@ -82,12 +83,11 @@
     --accent-foreground: oklch(0.21 0.006 285.885);
 
     --destructive: oklch(0.577 0.245 27.325);
-    --destructive-foreground: oklch(1 0 0); /* Исправлено на белый для читаемости */
+    --destructive-foreground: oklch(1 0 0);
 
     --border: oklch(0.92 0.004 286.32);
     --input: oklch(0.92 0.004 286.32);
 
-    /* Обводка фокуса тоже оранжевая */
     --ring: oklch(0.68 0.22 39);
 
     --chart-1: oklch(0.646 0.222 41.116);
@@ -98,7 +98,7 @@
 
     --sidebar: oklch(0.985 0 0);
     --sidebar-foreground: oklch(0.141 0.005 285.823);
-    --sidebar-primary: oklch(0.68 0.22 39); /* Активный пункт меню оранжевый */
+    --sidebar-primary: oklch(0.68 0.22 39);
     --sidebar-primary-foreground: oklch(1 0 0);
     --sidebar-accent: oklch(0.967 0.001 286.375);
     --sidebar-accent-foreground: oklch(0.21 0.006 285.885);
@@ -116,9 +116,8 @@
     --popover: oklch(0.21 0.006 285.885);
     --popover-foreground: oklch(0.985 0 0);
 
-    /* В темной теме оранжевый можно оставить таким же или чуть светлее */
     --primary: oklch(0.68 0.22 39);
-    --primary-foreground: oklch(0.21 0.006 285.885); /* Темный текст на ярком оранжевом */
+    --primary-foreground: oklch(0.21 0.006 285.885);
 
     --secondary: oklch(0.274 0.006 286.033);
     --secondary-foreground: oklch(0.985 0 0);

@@ -1,8 +1,9 @@
 import React from 'react';
 import { Head, usePage, router } from '@inertiajs/react';
-import MainLayout from '@/Layouts/MainLayout';
+import MainLayout from '@/layouts/MainLayout';
 import { Button } from '@/components/ui/button';
 import { LogOut, User, Wallet, Phone, Mail } from 'lucide-react';
+import {route} from "ziggy-js";
 
 export default function Profile() {
     // Получаем пользователя из глобальных пропсов (HandleInertiaRequests)

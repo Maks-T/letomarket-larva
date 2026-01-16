@@ -1,0 +1,152 @@
+ 
+ 
+ 
+name: letomarket
+
+services:
+  # Сервис Web-сервера (Nginx)
+  nginx:
+    image: nginx:alpine
+    container_name: '${APP_NAME:-letomarket}-nginx'
+    ports:
+      - "${APP_PORT:-80}:80"
+    volumes:
+      - ../:/var/www/html
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+    networks:
+      - default
+
+  # Сервис приложения (PHP 8.4 + Node + Composer)
+  app:
+    build:
+      context: ../
+      dockerfile: docker/php/Dockerfile
+      args:
+        user: laravel
+        uid: 1000
+    container_name: '${APP_NAME:-letomarket}-app'
+    restart: unless-stopped
+    ports:
+      - "${VITE_PORT:-5173}:5173"
+    volumes:
+      - ../:/var/www/html
+    environment:
+      VITE_HMR_HOST: localhost
+      XDEBUG_MODE: debug,develop
+    # Пробрасываем env файл внутрь
+    env_file:
+      - ../.env
+    depends_on:
+      - db
+      - redis
+    networks:
+      - default
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  # База данных
+  db:
+    image: mysql:8.0
+    container_name: '${APP_NAME:-letomarket}-db'
+    ports:
+      - "${DB_PORT:-3306}:3306"
+    environment:
+      MYSQL_DATABASE: '${DB_DATABASE}'
+      MYSQL_USER: '${DB_USERNAME}'
+      MYSQL_PASSWORD: '${DB_PASSWORD}'
+      MYSQL_ROOT_PASSWORD: '${DB_PASSWORD}'
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+    networks:
+      - default
+
+  # Кэш
+  redis:
+    image: redis:7-alpine
+    container_name: '${APP_NAME:-letomarket}-redis'
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      timeout: 3s
+      retries: 5
+    networks:
+      - default
+
+  # Админка БД (Adminer или PMA)
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: '${APP_NAME:-letomarket}-pma'
+    ports:
+      - "${PMA_PORT:-8081}:80"
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      UPLOAD_LIMIT: 64M
+    depends_on:
+      - db
+    networks:
+      - default
+
+volumes:
+  db_data:
+  redis_data:
+
+networks:
+  default:
+    name: ${APP_NAME:-letomarket}_net
+    driver: bridge
+ 
+# Перед запуском
+
+# В корне проекта (затем удалить перед установкой laravel)
+mkdir public
+touch public/index.php
+
+## Создать символическую ссылку
+cd /docker
+ln -s ../.env .env
+
+## Собрать контейнеры
+cd /docker
+docker compose up -d --build
+
+ 
+{
+  "listeners": {
+    "*:8080": {
+      "pass": "routes"
+    }
+  },
+  "routes": [
+    {
+      "action": {
+        "share": "/var/www/html/public$uri",
+        "fallback": {
+          "pass": "applications/laravel"
+        }
+      }
+    }
+  ],
+  "applications": {
+    "laravel": {
+      "type": "php",
+      "root": "/var/www/html/public",
+      "script": "index.php",
+      "user": "root",
+      "group": "root",
+      "options": {
+        "admin": {}
+      }
+    }
+  }
+} 

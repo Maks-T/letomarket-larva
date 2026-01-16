@@ -1,3 +1,5 @@
+import SaleIcon from "@components/ui/icons/SaleIcon.jsx";
+
 export const PHONE_NUMBER = "+7 (905) 909-58-19";
 
 export const TOP_MENU_ITEMS = [
@@ -13,7 +15,12 @@ export const TOP_MENU_ITEMS = [
 ];
 
 export const CATEGORIES = [
-    { label: "% Распродажа", href: "/sale", highlight: true },
+    {
+        label: "Распродажа",
+        href: "/sale",
+        highlight: true,
+        icon: SaleIcon
+    },
     { label: "ДПК", href: "/dpk" },
     { label: "Регулируемые опоры", href: "/supports" },
     { label: "Уличная мебель", href: "/furniture" },

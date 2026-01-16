@@ -1,14 +1,14 @@
 import { Link } from "@inertiajs/react";
 import { MapPin, Phone, Instagram, Send } from "lucide-react";
 import { cn } from "@/lib/utils";
-import HeaderContainer from "../UI/HeaderContainer";
-import SocialIcon from "../UI/SocialIcon";
+import Container from "@components/ui/Container.jsx";
+import SocialIcon from "@components/Header/ui/SocialIcon";
 import { TOP_MENU_ITEMS, PHONE_NUMBER } from "../constants";
 
 export default function TopBar({ currentPath }) {
     return (
-        <div className="border-b border-black/5 hidden xl:block">
-            <HeaderContainer>
+        <div className="hidden xl:block">
+            <Container>
                 <div className="flex justify-between items-center h-[50px]">
                     <div className="flex items-center gap-8">
                         <button className="flex items-center gap-1.5 hover:text-[#F15921] transition-colors font-normal text-[15px] text-[#2F2F2F]">
@@ -44,7 +44,7 @@ export default function TopBar({ currentPath }) {
                         </div>
                     </div>
                 </div>
-            </HeaderContainer>
+            </Container>
         </div>
     );
 }

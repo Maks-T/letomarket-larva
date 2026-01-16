@@ -1,13 +1,14 @@
-import { useState } from "react";
-import { usePage } from "@inertiajs/react";
-import { useAuth } from "@/features/auth";
-import TopBar from "./Desktop/TopBar";
-import MainHeaderRow from "./Desktop/MainHeaderRow";
-import CategoryBar from "./Desktop/CategoryBar";
-import MobileHeaderBar from "./Mobile/MobileHeaderBar";
-import MobileMenuDrawer from "./Mobile/MobileMenuDrawer";
+import {useState} from "react";
+import {usePage} from "@inertiajs/react";
+import {useAuth} from "@/features/auth";
+import TopBar from "@components/Header/desktop/TopBar";
+import MainHeaderRow from "@components/Header/desktop/MainHeaderRow";
+import CategoryBar from "@components/Header/desktop/CategoryBar";
+import MobileHeaderBar from "@components/Header/mobile/MobileHeaderBar";
+import MobileMenuDrawer from "@components/Header/mobile/MobileMenuDrawer";
+import {cn} from "@/lib/utils.js";
 
-export default function Header() {
+export default function Header({ transparentMode = false }) {
     const { openAuth } = useAuth();
     const user = usePage().props.auth.user;
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -16,13 +17,15 @@ export default function Header() {
     const currentPath = typeof window !== "undefined" ? window.location.pathname : "";
 
     return (
-        <header
-            className="w-full font-sans relative z-30 sticky top-0 backdrop-blur-md"
-            style={{
-                background: 'rgba(245, 243, 240, 0.94)',
-                boxShadow: '0 1px 6px 0 rgba(35, 35, 35, 0.14)'
-            }}
-        >
+      <header
+        className={cn(
+          "w-full relative z-30 transition-colors duration-300",
+          transparentMode
+            ? "bg-white/90 backdrop-blur-sm border-b border-white/20" // Полупрозрачный для Hero
+            : "bg-[rgba(245,243,240,0.94)] shadow-sm sticky top-0"    // Обычный
+        )}
+      >
+
             {/* Десктопные компоненты */}
             <TopBar currentPath={currentPath} />
             <MainHeaderRow user={user} openAuth={openAuth} />
