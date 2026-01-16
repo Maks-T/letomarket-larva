@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { usePage } from "@inertiajs/react";
-import { useAuth } from "@/Contexts/AuthContext.jsx";
+import { useAuth } from "@/features/auth";
 import TopBar from "./Desktop/TopBar";
 import MainHeaderRow from "./Desktop/MainHeaderRow";
 import CategoryBar from "./Desktop/CategoryBar";

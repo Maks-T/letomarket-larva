@@ -1,7 +1,6 @@
 import Header from "@/components/Header/index.jsx";
 import Footer from "@/components/Footer.jsx";
-import AuthModal from "@/components/Auth/AuthModal.jsx";
-import { useAuth } from "@/Contexts/AuthContext";
+import { AuthModal } from "@/features/auth";
 
 export default function MainLayout({ children }) {
     // Мы просто рендерим AuthModal здесь, он сам подключится к контексту
