@@ -1,12 +1,12 @@
 import { Link } from "@inertiajs/react";
 import { cn } from "@/lib/utils";
-import Container from "@components/ui/Container.jsx";
+import BaseContainer from "@components/ui/BaseContainer.jsx";
 import { CATEGORIES } from "../constants";
 
 export default function CategoryBar({ currentPath }) {
   return (
     <div className="hidden lg:block border-t border-border">
-      <Container>
+      <BaseContainer>
         <div className="flex items-center justify-between h-[52px]">
           <nav className="flex-1 overflow-hidden">
             <ul className="flex items-center gap-8 overflow-x-auto scrollbar-hide">
@@ -45,7 +45,7 @@ export default function CategoryBar({ currentPath }) {
             Дарим 100 бонусов за регистрацию
           </div>
         </div>
-      </Container>
+      </BaseContainer>
     </div>
   );
 }

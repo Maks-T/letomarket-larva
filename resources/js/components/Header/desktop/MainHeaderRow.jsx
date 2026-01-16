@@ -1,12 +1,12 @@
 import { Link } from "@inertiajs/react";
 import { Heart, Menu, Search, ShoppingCart, User } from "lucide-react";
-import Container from "@components/ui/Container.jsx";
+import BaseContainer from "@components/ui/BaseContainer.jsx";
 import ActionPill from "@components/Header/ui/ActionPill";
 
 export default function MainHeaderRow({ user, openAuth }) {
     return (
       <div className="py-4 hidden lg:block">
-          <Container>
+          <BaseContainer>
               <div className="flex items-center justify-between gap-6">
 
                   {/* Логотип */}
@@ -48,7 +48,7 @@ export default function MainHeaderRow({ user, openAuth }) {
                       <ActionPill icon={ShoppingCart} label="Корзина" href="/cart" variant="yellow" count={2} />
                   </div>
               </div>
-          </Container>
+          </BaseContainer>
       </div>
     );
 }
